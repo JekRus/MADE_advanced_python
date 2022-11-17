@@ -8,14 +8,19 @@ handlers:
     level: INFO
     formatter: simple
     stream: ext://sys.stdout
+  file:
+    class: logging.FileHandler
+    level: INFO
+    formatter: simple
+    filename: applog.log
 loggers:
   server:
     level: INFO
-    handlers: [console]
+    handlers: [console, file]
     propagate: no
   client:
     level: INFO
-    handlers: [console]
+    handlers: [console, file]
     propagate: no
 root:
   level: DEBUG
