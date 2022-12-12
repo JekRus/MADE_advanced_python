@@ -20,11 +20,11 @@
 
 Запуск скрипта:
 ```commandline
-python compare_performace.py 1_000_000
+$ python compare_performace.py 1_000_000
 ```
 Для профилирования использования памяти:
 ```commandline
-python -m memory_profiler compare_performace.py 1_000_000
+$ python -m memory_profiler compare_performace.py 1_000_000
 ```
 
 ### 3. Сравнение времени создания экземпляров, доступа/изменения/удаления атрибутов

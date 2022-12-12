@@ -1,5 +1,5 @@
 import pytest
-from src.validation_descriptors import (
+from validation_descriptors import (
     Integer, PositiveInteger, String, Login, Password
 )
 

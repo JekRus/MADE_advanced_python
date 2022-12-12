@@ -4,7 +4,7 @@ from functools import reduce
 import pytest
 import numpy as np
 
-from src.matmul import Matrix
+from matmul import Matrix
 
 
 def generate_random_matrix_list(

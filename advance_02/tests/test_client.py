@@ -7,27 +7,27 @@ import pytest
 from client import Client
 
 
-def test_init():
+def test_init(test_urls_filename):
     n_threads = min(10, Client.MAX_THREADS)
-    client = Client(n_threads, '../data/test_urls.txt')
+    client = Client(n_threads, test_urls_filename)
     assert client._n_threads == n_threads
-    client = Client(Client.MAX_THREADS + 10, '../data/test_urls.txt')
+    client = Client(Client.MAX_THREADS + 10, test_urls_filename)
     assert client._n_threads == Client.MAX_THREADS
 
 
-def test_read_urls():
+def test_read_urls(test_urls_filename):
     check = [
         'https://en.wikipedia.org/wiki/Georgia_State_Route_74',
         'https://en.wikipedia.org/wiki/Mediated_reference_theory'
     ]
-    client = Client(1, '../data/test_urls.txt')
+    client = Client(1, test_urls_filename)
     client._read_urls()
 
     assert client._urls == check
 
 
-def test_construct_task_queue():
-    client = Client(1, '../data/test_urls.txt')
+def test_construct_task_queue(test_urls_filename):
+    client = Client(1, test_urls_filename)
     client._read_urls()
     client._construct_task_queue()
     ref_queue = queue.Queue(3)

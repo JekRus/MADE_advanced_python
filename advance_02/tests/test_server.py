@@ -59,8 +59,8 @@ def server_app(*args):
     server.run()
 
 
-def test_communication():
-    th_client = Process(target=client_app, args=(1, '../data/test_urls.txt'))
+def test_communication(test_urls_filename):
+    th_client = Process(target=client_app, args=(1, test_urls_filename))
     th_server = Process(target=server_app, args=(10, 5))
     try:
         th_server.start()

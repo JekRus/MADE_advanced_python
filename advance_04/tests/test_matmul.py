@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.matmul import matmul_c_ext
+from matmul import matmul
 
 
 def test_matmul_simple():
@@ -17,8 +17,7 @@ def test_matmul_simple():
         [21, 24, 27],
         [47, 54, 61]
     ]
-
-    matrix_result = matmul_c_ext([matrix_a, matrix_b])
+    matrix_result = matmul([matrix_a, matrix_b])
     assert matrix_ans == matrix_result
 
 
@@ -36,11 +35,11 @@ def test_wrong_size():
     ]
 
     with pytest.raises(ValueError):
-        matmul_c_ext([matrix_a, matrix_b])
+        matmul([matrix_a, matrix_b])
     with pytest.raises(ValueError):
-        matmul_c_ext([matrix_a, matrix_b, matrix_c])
+        matmul([matrix_a, matrix_b, matrix_c])
     with pytest.raises(ValueError):
-        matmul_c_ext([matrix_a, matrix_c, matrix_b])
+        matmul([matrix_a, matrix_c, matrix_b])
 
 
 def test_chain():
@@ -62,7 +61,7 @@ def test_chain():
         [1958],
     ]
 
-    matrix_result = matmul_c_ext([matrix_a, matrix_b, matrix_c])
+    matrix_result = matmul([matrix_a, matrix_b, matrix_c])
     assert matrix_ans == matrix_result
 
 
@@ -76,18 +75,18 @@ def test_small_matrix():
         [[6]],
     ]
     matrix_ans = [[720]]
-    matrix_result = matmul_c_ext(matrices)
+    matrix_result = matmul(matrices)
     assert matrix_result == matrix_ans
 
 
 def test_empty_list():
     with pytest.raises(ValueError):
-        matmul_c_ext([])
+        matmul([])
 
 
 def test_empty_matrix():
     empty_matrix = [[]]
-    result = matmul_c_ext([empty_matrix])
+    result = matmul([empty_matrix])
     assert result == empty_matrix
 
 
@@ -98,10 +97,10 @@ def test_single_matrix():
         [7, 8, 9],
     ]
     matrices = [matrix]
-    matrix_result = matmul_c_ext(matrices)
+    matrix_result = matmul(matrices)
     assert matrix_result == matrix
 
 
 def test_random_matrices(matmul_random_test_case):
-    matrix_result = matmul_c_ext(matmul_random_test_case.matrix_list)
+    matrix_result = matmul(matmul_random_test_case.matrix_list)
     assert np.allclose(np.array(matrix_result), matmul_random_test_case.answer)

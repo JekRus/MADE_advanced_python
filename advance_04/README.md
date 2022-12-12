@@ -21,20 +21,20 @@ test_matmul_benchmark           6,275.8347 (33.73)    8,633.3103 (44.36)    6,95
 ## How to reproduce
 1. Build CDLL from C source code:
 ```commandline
-$ cd path_to_repo/MADE_python/04/src/c_package
+$ cd path_to_repo/MADE_python/advance_04
 $ make
 ```
 2. Prepare virtual environment:
 ```commandline
-cd path_to_repo/MADE_python/04/
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+$ cd path_to_repo/MADE_python/advance_04
+$ python -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
 ```
 
 3. Run tests and benchmark:
 ```commandline
-$ cd path_to_repo/MADE_python/04/src
+$ cd path_to_repo/MADE_python/advance_04
 $ python -m pytest tests
 ```
 

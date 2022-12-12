@@ -1,5 +1,5 @@
 import pytest
-from src.attribute_modifier_metaclass import CustomMeta
+from attribute_modifier_metaclass import CustomMeta
 
 
 def test_custom_metaclass():

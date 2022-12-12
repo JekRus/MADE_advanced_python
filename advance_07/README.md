@@ -14,6 +14,20 @@ and goodness thresholds as input. The function returns:
 3. Tests for Python int.
 4. Tests for Python str.partition.
 
+## Install dependencies
+```commandline
+$ cd path_to_repo/MADE_python/advance_07
+$ python -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
+```
+
+# Tests
+
+```commandline
+$ python -m pytest tests
+```
+
 
 ## Software versions
 ```

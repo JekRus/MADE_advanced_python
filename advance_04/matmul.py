@@ -166,7 +166,9 @@ def transform_ctypes_to_matrix(matrix_c, n_rows: int, n_cols: int):
     return None
 
 
-def matmul_c_ext(matrix_list: List[Matrix]) -> Matrix:
+def matmul_c_ext(
+        matrix_list: List[Matrix], lib_path: str = "lib/matmul.so"
+) -> Matrix:
     """
     Performs chained matrix multiplication of matrices
     in the parameter list using C functions.
@@ -174,6 +176,8 @@ def matmul_c_ext(matrix_list: List[Matrix]) -> Matrix:
     Parameters
     ----------
     matrix_list : List[Matrix]
+    lib_path : str
+        Path to the library file.
 
     Returns
     -------
@@ -194,7 +198,7 @@ def matmul_c_ext(matrix_list: List[Matrix]) -> Matrix:
         )
 
     #  prepare C function
-    matmul_lib = cdll.LoadLibrary("c_package/lib/matmul.so")
+    matmul_lib = cdll.LoadLibrary(lib_path)
     matmul_chain = matmul_lib.matmul_chain
     matmul_chain.argtypes = [
         POINTER(POINTER(POINTER(c_double))),

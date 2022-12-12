@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.matmul import matmul, matmul_c_ext
+from matmul import matmul, matmul_c_ext
 
 
 def test_matmul_benchmark(benchmark, matmul_benchmark_test_case):

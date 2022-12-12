@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Werror -O3 -fPIC
-SOURCE_DIR=src
+SOURCE_DIR=.
 BUILD_DIR=lib
 
 build: $(SOURCE_DIR)/matmul.c $(SOURCE_DIR)/matmul.h
