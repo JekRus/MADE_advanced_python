@@ -79,7 +79,7 @@ class Client:
         for worker in self._workers:
             worker.join()
 
-    def _receive_data(self, connection_socket):
+    def _receive_data(self, connection_socket: socket.socket) -> str:
         data = []
         chunk = connection_socket.recv(Client.BUFFER_SIZE).decode('utf-8')
         while not chunk.endswith('\0'):
@@ -89,7 +89,7 @@ class Client:
         data = ''.join(data)
         return data
 
-    def _process_url(self, url):
+    def _process_url(self, url: str):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((self._host, self._port))
             msg = f'{url}\0'

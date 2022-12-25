@@ -3,7 +3,7 @@ import socket
 import queue
 import json
 import re
-from typing import Union
+from typing import Union, Dict
 from collections import Counter
 from threading import Thread, Lock
 from string import punctuation
@@ -28,16 +28,16 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 class HTMLParser:
-    def __init__(self, doc):
+    def __init__(self, doc: str):
         self.doc = doc
 
-    def get_text(self):
+    def get_text(self) -> str:
         soup = BeautifulSoup(self.doc, features="html.parser")
         text = soup.get_text()
         text = text.translate(text.maketrans('', '', punctuation))
         return text
 
-    def get_top_words(self, n_top):
+    def get_top_words(self, n_top: int) -> Dict[str, int]:
         text = self.get_text()
         words = text.split()
         most_common_words = dict(Counter(words).most_common(n_top))
@@ -104,7 +104,7 @@ class Server:
         for worker in self._workers:
             worker.join()
 
-    def _receive_data(self, connection_socket):
+    def _receive_data(self, connection_socket: socket.socket) -> str:
         data = []
         chunk = connection_socket.recv(Server.BUFFER_SIZE).decode('utf-8')
         while not chunk.endswith('\0'):
@@ -114,7 +114,7 @@ class Server:
         data = ''.join(data)
         return data
 
-    def _process_query(self, url):
+    def _process_query(self, url: str) -> str:
         url_regex = re.compile(
             r'((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.'
             r'([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*'
@@ -135,7 +135,7 @@ class Server:
         result_msg = json.dumps(dict(most_common_words))
         return result_msg
 
-    def _process_client(self, connection_socket):
+    def _process_client(self, connection_socket: socket.socket):
         url = self._receive_data(connection_socket)
         result_msg = self._process_query(url)
         result_msg += '\0'
