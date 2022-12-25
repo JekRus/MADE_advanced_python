@@ -23,6 +23,7 @@ def get_parser() -> argparse.ArgumentParser:
 class Client:
     MAX_THREADS = 20
     BUFFER_SIZE = 4096
+    MAX_TASKS_IN_QUEUE = 1000
     THREAD_KILLER_TASK = '_STOP'
 
     def __init__(self, n_threads: int, filename: str, host: str = 'localhost',
@@ -40,28 +41,32 @@ class Client:
         self._filename = filename
         self._host = host
         self._port = port
+        self._task_queue_constructor = None
         self._workers = None
         self._urls = None
         self._task_queue = None
 
     def run(self):
-        logger.info('Read data.')
-        self._read_urls()
         logger.info('Start workers.')
-        self._construct_task_queue()
+        self._start_task_queue_constructor()
         self._start_workers()
         self._stop_workers()
+        self._stop_task_queue_constructor()
         logger.info('Stop client application.')
 
-    def _read_urls(self):
-        with open(self._filename, 'r') as f_in:
-            self._urls = [url.strip() for url in f_in.readlines()]
-
     def _construct_task_queue(self):
-        self._task_queue = queue.Queue(len(self._urls) + 1)
-        for url in self._urls:
-            self._task_queue.put(url)
+        self._task_queue = queue.Queue(self.MAX_TASKS_IN_QUEUE + 1)
+        with open(self._filename, 'r') as f:
+            for line in f:
+                self._task_queue.put(line.strip())
         self._task_queue.put(Client.THREAD_KILLER_TASK)
+
+    def _start_task_queue_constructor(self):
+        self._task_queue_constructor = Thread(target=self._construct_task_queue)
+        self._task_queue_constructor.start()
+
+    def _stop_task_queue_constructor(self):
+        self._task_queue_constructor.join()
 
     def _start_workers(self):
         self._workers = [

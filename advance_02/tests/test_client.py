@@ -18,25 +18,18 @@ def test_init(test_urls_filename):
 def test_read_urls(test_urls_filename):
     check = [
         'https://en.wikipedia.org/wiki/Georgia_State_Route_74',
-        'https://en.wikipedia.org/wiki/Mediated_reference_theory'
+        'https://en.wikipedia.org/wiki/Mediated_reference_theory',
+        Client.THREAD_KILLER_TASK,
     ]
     client = Client(1, test_urls_filename)
-    client._read_urls()
+    client._start_task_queue_constructor()
+    client._stop_task_queue_constructor()
 
-    assert client._urls == check
+    urls = []
+    while not client._task_queue.empty():
+        urls.append(client._task_queue.get())
 
-
-def test_construct_task_queue(test_urls_filename):
-    client = Client(1, test_urls_filename)
-    client._read_urls()
-    client._construct_task_queue()
-    ref_queue = queue.Queue(3)
-    ref_queue.put('https://en.wikipedia.org/wiki/Georgia_State_Route_74')
-    ref_queue.put('https://en.wikipedia.org/wiki/Mediated_reference_theory')
-    ref_queue.put(client.THREAD_KILLER_TASK)
-    assert client._task_queue.qsize() == ref_queue.qsize()
-    for _ in range(client._task_queue.qsize()):
-        assert client._task_queue.get() == ref_queue.get()
+    assert urls == check
 
 
 @pytest.mark.parametrize(
@@ -71,3 +64,14 @@ def test_receive_data(msg, port):
 
     th_sender.join()
     assert received_msg == msg
+
+
+def test_max_loaded_urls(file_with_10000_fake_urls):
+    client = Client(1, file_with_10000_fake_urls)
+    client._start_task_queue_constructor()
+    sleep(0.3)
+    assert client._task_queue.qsize() <= Client.MAX_TASKS_IN_QUEUE + 1
+    while True:
+        if client._task_queue.get() == Client.THREAD_KILLER_TASK:
+            break
+    client._stop_task_queue_constructor()
