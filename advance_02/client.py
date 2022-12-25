@@ -89,23 +89,33 @@ class Client:
         data = ''.join(data)
         return data
 
+    def _process_url(self, url):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect((self._host, self._port))
+            msg = f'{url}\0'
+            sock.sendall(msg.encode('utf-8'))
+            response = self._receive_data(sock)
+            try:
+                result = json.loads(response)
+            except json.decoder.JSONDecodeError:
+                logger.warning('Bad response from server: %s', response)
+            else:
+                logger.info('%s: %s', url, result)
+
     def _process_tasks(self):
         while True:
             url = self._task_queue.get()
             if url == Client.THREAD_KILLER_TASK:
                 self._task_queue.put(Client.THREAD_KILLER_TASK)
                 return
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect((self._host, self._port))
-                msg = f'{url}\0'
-                sock.sendall(msg.encode('utf-8'))
-                response = self._receive_data(sock)
-                try:
-                    result = json.loads(response)
-                except json.decoder.JSONDecodeError:
-                    logger.warning(f'Bad response from server: {response}')
-                else:
-                    logger.info('%s: %s', url, result)
+            try:
+                self._process_url(url)
+            except Exception as e:
+                logger.error(
+                    'Unexpected error occurred while processing url. URL: %s; Exception: %s',
+                    url,
+                    str(e)
+                )
 
 
 if __name__ == "__main__":
