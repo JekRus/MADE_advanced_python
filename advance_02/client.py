@@ -56,10 +56,14 @@ class Client:
 
     def _construct_task_queue(self):
         self._task_queue = queue.Queue(self.MAX_TASKS_IN_QUEUE + 1)
-        with open(self._filename, 'r') as f:
-            for line in f:
-                self._task_queue.put(line.strip())
-        self._task_queue.put(Client.THREAD_KILLER_TASK)
+        try:
+            with open(self._filename, 'r') as f:
+                for line in f:
+                    self._task_queue.put(line.strip())
+        except Exception as e:
+            logger.error("Unexpected error occurred during reading file: %s", str(e))
+        finally:
+            self._task_queue.put(Client.THREAD_KILLER_TASK)
 
     def _start_task_queue_constructor(self):
         self._task_queue_constructor = Thread(target=self._construct_task_queue)
