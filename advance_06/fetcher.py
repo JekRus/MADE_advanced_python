@@ -11,6 +11,7 @@ from logger import init_logger
 logger = init_logger("logging_conf.yaml", "fetcher")
 
 
+MAX_TASK_QUEUE_SIZE = 1000
 STOP_TASK = "STOP_TASK"
 RESPONSE_OK = 200
 
@@ -84,18 +85,28 @@ def get_parser():
     return parser
 
 
+async def coro_reader(task_queue: asyncio.Queue, input_filename: str):
+    try:
+        async with aiofiles.open(input_filename, "r") as f:
+            async for line in f:
+                await task_queue.put(line.strip())
+    except Exception as e:
+        logger.error("Unexpected error occurred during reading file: %s", str(e))
+    finally:
+        await task_queue.put(STOP_TASK)
+
+
 async def main(args):
     logger.info("Start async url fetcher.")
-    task_queue = asyncio.Queue()
-    async with aiofiles.open(args.input_filename, "r") as f:
-        async for line in f:
-            await task_queue.put(line.strip())
-    await task_queue.put(STOP_TASK)
+    task_queue = asyncio.Queue(maxsize=MAX_TASK_QUEUE_SIZE)
 
     workers = [
         asyncio.create_task(coro_fetcher(task_queue, args.output_dir_name))
         for _ in range(args.n_simultaneous_requests)
     ]
+    workers.append(
+        asyncio.create_task(coro_reader(task_queue, args.input_filename))
+    )
 
     await asyncio.gather(*workers)
 
