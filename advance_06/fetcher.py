@@ -44,15 +44,22 @@ async def coro_fetcher(task_queue: asyncio.Queue, output_dir_name: str) -> None:
                 task_queue.task_done()
                 return
 
-            html = await fetch_url(session, url)
-
-            if html:
-                await save_html(url, html, output_dir_name)
-                logger.info("Task done: %s", url)
-            else:
-                logger.warning("Bad response: %s", url)
-
-            task_queue.task_done()
+            try:
+                html = await fetch_url(session, url)
+                if html:
+                    await save_html(url, html, output_dir_name)
+                    logger.info("Task done: %s", url)
+                else:
+                    logger.warning("Bad response: %s", url)
+            except Exception as e:
+                logger.error(
+                    'Unexpected error occurred while processing url. '
+                    'URL: %s; Exception: %s',
+                    url,
+                    str(e)
+                )
+            finally:
+                task_queue.task_done()
 
 
 def get_parser():
