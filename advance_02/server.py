@@ -135,19 +135,30 @@ class Server:
         result_msg = json.dumps(dict(most_common_words))
         return result_msg
 
+    def _process_client(self, connection_socket):
+        url = self._receive_data(connection_socket)
+        result_msg = self._process_query(url)
+        result_msg += '\0'
+        connection_socket.sendall(result_msg.encode('utf-8'))
+        with self._task_counter_lock:
+            self._task_counter += 1
+            logger.info('Total processed: %d tasks', self._task_counter)
+
     def _handle_connections(self):
         while True:
             connection_socket, address = self._task_queue.get()
             if connection_socket == Server.THREAD_KILLER_TASK:
                 self._task_queue.put((Server.THREAD_KILLER_TASK, address))
                 return
-            url = self._receive_data(connection_socket)
-            result_msg = self._process_query(url)
-            result_msg += '\0'
-            connection_socket.sendall(result_msg.encode('utf-8'))
-            with self._task_counter_lock:
-                self._task_counter += 1
-                logger.info('Total processed: %d tasks', self._task_counter)
+            try:
+                self._process_client(connection_socket)
+            except Exception as e:
+                logger.error(
+                    'Unexpected error occurred while processing client. '
+                    'Client address: %s; Exception: %s',
+                    address,
+                    str(e)
+                )
 
 
 if __name__ == "__main__":
