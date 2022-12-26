@@ -14,10 +14,25 @@ import pytest
         ("sesepsep", "sep", ("se", "sep", "sep")),
         ("sepsepse", "sep", ("", "sep", "sepse")),
         ("//", "/", ("", "/", "/")),
+        ("sep_at_leftsuffix", "sep_at_left", ("", "sep_at_left", "suffix")),
+        ("prefixsep_at_right", "sep_at_right", ("prefix", "sep_at_right", "")),
     ],
 )
 def test_partition_basic(test_string, sep, exp_answer):
     assert test_string.partition(sep) == exp_answer
+
+
+@pytest.mark.parametrize(
+    "test_string",
+    [
+        "some/string",
+        "digit1sep1",
+        "QJMDQlkfsdkl",
+        "\t\n \t\t",
+    ],
+)
+def test_self_partition(test_string):
+    assert test_string.partition(test_string) == ("", test_string, "")
 
 
 @pytest.mark.parametrize(
