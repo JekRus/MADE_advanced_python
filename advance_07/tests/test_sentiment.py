@@ -1,8 +1,9 @@
+from contextlib import nullcontext as does_not_raise
 from unittest.mock import patch
 import pytest
 
 import sentiment
-from sentiment import predict_message_mood
+from sentiment import predict_message_mood, SomeModel
 
 
 @pytest.mark.parametrize(
@@ -123,3 +124,23 @@ def test_predict_message_mood_corner_case(
         model = sentiment.SomeModel()
         answer = predict_message_mood(message, model, bad_thresholds, good_thresholds)
         assert answer == expected_answer
+
+
+@pytest.mark.parametrize(
+    'message,expectation',
+    [
+        ('any_string', does_not_raise()),
+        ('UPPER and lower case and digits 021943', does_not_raise()),
+        ('\t\t\n\t', does_not_raise()),
+        (42, pytest.raises(TypeError)),
+        (-127.3, pytest.raises(TypeError)),
+        (0, pytest.raises(TypeError)),
+        (None, pytest.raises(TypeError)),
+        ({'a': 1, 'b': 2}, pytest.raises(TypeError)),
+        ({3, 4, -12}, pytest.raises(TypeError)),
+    ]
+)
+def test_model_predict_wrong_argument(message, expectation):
+    model = SomeModel()
+    with expectation:
+        assert model.predict(message) is not None

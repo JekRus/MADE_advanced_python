@@ -9,6 +9,11 @@ import pytest
         ("repeated/sep/in/str", "/", ("repeated", "/", "sep/in/str")),
         ("no sep", "/", ("no sep", "", "")),
         ("long_/_sep", "_/_", ("long", "_/_", "sep")),
+        ("whole_string_is_sep", "whole_string_is_sep", ("", "whole_string_is_sep", "")),
+        ("sepsep", "sep", ("", "sep", "sep")),
+        ("sesepsep", "sep", ("se", "sep", "sep")),
+        ("sepsepse", "sep", ("", "sep", "sepse")),
+        ("//", "/", ("", "/", "/")),
     ],
 )
 def test_partition_basic(test_string, sep, exp_answer):

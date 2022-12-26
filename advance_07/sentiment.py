@@ -1,5 +1,10 @@
 class SomeModel:
     def predict(self, message: str) -> float:
+        if not isinstance(message, str):
+            raise TypeError(
+                f"Parameter 'message' must be an str, "
+                f"got {type(message).__name__} instead."
+            )
         prediction = 0.5
         for ch_idx in range(len(message) - 1):
             if message[ch_idx: ch_idx + 2] == ":)":
